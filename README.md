@@ -73,31 +73,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 This client provides access to all FRED API endpoints:
 
 ### Categories
+
 - Get categories and subcategories
 - Search and filter categories
 - Get series within categories
 
 ### Series
+
 - Retrieve economic data series
 - Get observations/data points
 - Search series by text or tags
 - Get series metadata and vintage dates
 
 ### Releases
+
 - Access economic data releases
 - Get release dates and sources
 - Browse release-specific series
 
 ### Sources
+
 - Get data sources information
 - Browse source-specific releases
 
 ### Tags
+
 - Search and filter by tags
 - Get related tags
 - Browse tagged series
 
 ### GeoFRED
+
 - Geographic/regional economic data
 - Shape files for mapping
 - Regional data series
@@ -109,9 +115,12 @@ https://fred.stlouisfed.org/docs/api/api_key.html
 
 ## Response Formats
 
-The API supports multiple response formats:
-- `xml` (default)
+NOTE: This library currently only supports the JSON response format.
+
+The FRED API supports multiple response formats:
+
 - `json`
+- `xml` (default)
 
 Specify the format using the `file_type` parameter in API calls.
 

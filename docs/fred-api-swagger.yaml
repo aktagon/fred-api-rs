@@ -1,0 +1,1168 @@
+openapi: 3.0.3
+info:
+  title: FRED API
+  description: Federal Reserve Economic Data (FRED) API - Economic data from the Federal Reserve Bank of St. Louis
+  version: 1.0.0
+  contact:
+    name: Federal Reserve Bank of St. Louis
+    url: https://fred.stlouisfed.org/docs/api/
+  license:
+    name: Terms of Use
+    url: https://fred.stlouisfed.org/legal/
+servers:
+  - url: https://api.stlouisfed.org
+    description: FRED API Production Server
+
+components:
+  parameters:
+    ApiKey:
+      name: api_key
+      in: query
+      required: true
+      description: 32 character alpha-numeric lowercase string
+      schema:
+        type: string
+        pattern: "^[a-z0-9]{32}$"
+    FileType:
+      name: file_type
+      in: query
+      required: false
+      description: Response format
+      schema:
+        type: string
+        enum: [xml, json]
+        default: json
+    RealtimeStart:
+      name: realtime_start
+      in: query
+      required: false
+      description: Start of the real-time period (YYYY-MM-DD)
+      schema:
+        type: string
+        format: date
+    RealtimeEnd:
+      name: realtime_end
+      in: query
+      required: false
+      description: End of the real-time period (YYYY-MM-DD)
+      schema:
+        type: string
+        format: date
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of results to return
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 1000
+    Offset:
+      name: offset
+      in: query
+      required: false
+      description: Number of results to skip
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SortOrder:
+      name: sort_order
+      in: query
+      required: false
+      description: Sort order
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
+
+paths:
+  /fred/category:
+    get:
+      summary: Get a category
+      description: Get information about a specific category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: category_id
+          in: query
+          required: false
+          description: The ID for a category (default is root category)
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: object
+
+  /fred/category/children:
+    get:
+      summary: Get child categories
+      description: Get the child categories for a specified parent category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: category_id
+          in: query
+          required: false
+          description: The ID for a category
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/category/related:
+    get:
+      summary: Get related categories
+      description: Get the related categories for a category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: category_id
+          in: query
+          required: true
+          description: The ID for a category
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/category/series:
+    get:
+      summary: Get series in a category
+      description: Get the series in a category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: category_id
+          in: query
+          required: true
+          description: The ID for a category
+          schema:
+            type: integer
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum:
+              [
+                series_id,
+                title,
+                units,
+                frequency,
+                seasonal_adjustment,
+                realtime_start,
+                realtime_end,
+                last_updated,
+                observation_start,
+                observation_end,
+                popularity,
+                group_popularity,
+              ]
+        - name: filter_variable
+          in: query
+          required: false
+          description: Variable to filter results by
+          schema:
+            type: string
+            enum: [frequency, units, seasonal_adjustment]
+        - name: filter_value
+          in: query
+          required: false
+          description: Value to filter by
+          schema:
+            type: string
+        - name: tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: exclude_tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names to exclude
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/category/tags:
+    get:
+      summary: Get category tags
+      description: Get the FRED tags for a category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: category_id
+          in: query
+          required: true
+          description: The ID for a category
+          schema:
+            type: integer
+        - name: tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: tag_group_id
+          in: query
+          required: false
+          description: Tag group ID
+          schema:
+            type: string
+            enum: [freq, gen, geo, geot, rls, seas, src]
+        - name: search_text
+          in: query
+          required: false
+          description: Text to search for
+          schema:
+            type: string
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum: [series_count, popularity, created, name, group_id]
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/category/related_tags:
+    get:
+      summary: Get related category tags
+      description: Get the related FRED tags for one or more FRED tags within a category
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: category_id
+          in: query
+          required: true
+          description: The ID for a category
+          schema:
+            type: integer
+        - name: tag_names
+          in: query
+          required: true
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: exclude_tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names to exclude
+          schema:
+            type: string
+        - name: tag_group_id
+          in: query
+          required: false
+          description: Tag group ID
+          schema:
+            type: string
+            enum: [freq, gen, geo, geot, rls, seas, src]
+        - name: search_text
+          in: query
+          required: false
+          description: Text to search for
+          schema:
+            type: string
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum: [series_count, popularity, created, name, group_id]
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/releases:
+    get:
+      summary: Get all releases
+      description: Get all releases of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum:
+              [release_id, name, press_release, realtime_start, realtime_end]
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/releases/dates:
+    get:
+      summary: Get release dates
+      description: Get release dates for all releases of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - name: sort_order
+          in: query
+          required: false
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum: [release_date, release_id, release_name]
+        - name: include_release_dates_with_no_data
+          in: query
+          required: false
+          description: Include release dates with no data
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "false"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release:
+    get:
+      summary: Get a release
+      description: Get a release of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/dates:
+    get:
+      summary: Get release dates for a release
+      description: Get release dates for a release of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 10000
+        - name: offset
+          in: query
+          required: false
+          description: Number of results to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: include_release_dates_with_no_data
+          in: query
+          required: false
+          description: Include release dates with no data
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "false"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/series:
+    get:
+      summary: Get release series
+      description: Get the series on a release of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum:
+              [
+                series_id,
+                title,
+                units,
+                frequency,
+                seasonal_adjustment,
+                realtime_start,
+                realtime_end,
+                last_updated,
+                observation_start,
+                observation_end,
+                popularity,
+                group_popularity,
+              ]
+        - name: filter_variable
+          in: query
+          required: false
+          description: Variable to filter results by
+          schema:
+            type: string
+            enum: [frequency, units, seasonal_adjustment]
+        - name: filter_value
+          in: query
+          required: false
+          description: Value to filter by
+          schema:
+            type: string
+        - name: tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: exclude_tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names to exclude
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/sources:
+    get:
+      summary: Get release sources
+      description: Get the sources for a release of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/tags:
+    get:
+      summary: Get release tags
+      description: Get the FRED tags for a release
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+        - name: tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: tag_group_id
+          in: query
+          required: false
+          description: Tag group ID
+          schema:
+            type: string
+            enum: [freq, gen, geo, geot, rls, seas, src]
+        - name: search_text
+          in: query
+          required: false
+          description: Text to search for
+          schema:
+            type: string
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum: [series_count, popularity, created, name, group_id]
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/related_tags:
+    get:
+      summary: Get related release tags
+      description: Get the related FRED tags for one or more FRED tags within a release
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+        - name: tag_names
+          in: query
+          required: true
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: exclude_tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names to exclude
+          schema:
+            type: string
+        - name: tag_group_id
+          in: query
+          required: false
+          description: Tag group ID
+          schema:
+            type: string
+            enum: [freq, gen, geo, geot, rls, seas, src]
+        - name: search_text
+          in: query
+          required: false
+          description: Text to search for
+          schema:
+            type: string
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum: [series_count, popularity, created, name, group_id]
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/release/tables:
+    get:
+      summary: Get release tables
+      description: Get release table trees for a given release
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: release_id
+          in: query
+          required: true
+          description: The ID for a release
+          schema:
+            type: integer
+        - name: element_id
+          in: query
+          required: false
+          description: The release table element ID
+          schema:
+            type: integer
+        - name: include_observation_values
+          in: query
+          required: false
+          description: Include observation values
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "false"
+        - name: observation_date
+          in: query
+          required: false
+          description: Date of observation
+          schema:
+            type: string
+            format: date
+            default: "9999-12-31"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series:
+    get:
+      summary: Get a series
+      description: Get an economic data series
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/observations:
+    get:
+      summary: Get series observations
+      description: Get the observations or data values for an economic data series
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - name: file_type
+          in: query
+          required: false
+          description: Response format (supports additional formats for this endpoint)
+          schema:
+            type: string
+            enum: [xml, json, xlsx, csv]
+            default: json
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/SortOrder"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 100000
+        - name: offset
+          in: query
+          required: false
+          description: Number of results to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: observation_start
+          in: query
+          required: false
+          description: Start date for observations
+          schema:
+            type: string
+            format: date
+            default: "1776-07-04"
+        - name: observation_end
+          in: query
+          required: false
+          description: End date for observations
+          schema:
+            type: string
+            format: date
+            default: "9999-12-31"
+        - name: units
+          in: query
+          required: false
+          description: Data transformation
+          schema:
+            type: string
+            enum: [lin, chg, ch1, pch, pc1, pca, cch, cca, log]
+            default: lin
+        - name: frequency
+          in: query
+          required: false
+          description: Data frequency
+          schema:
+            type: string
+            enum: [d, w, bw, m, q, sa, a]
+        - name: aggregation_method
+          in: query
+          required: false
+          description: Aggregation method
+          schema:
+            type: string
+            enum: [avg, sum, eop]
+            default: avg
+        - name: output_type
+          in: query
+          required: false
+          description: Output type
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 4
+            default: 1
+        - name: vintage_dates
+          in: query
+          required: false
+          description: Comma-separated list of vintage dates
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/search:
+    get:
+      summary: Search series
+      description: Get economic data series that match search text
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - name: search_text
+          in: query
+          required: true
+          description: Text to search for
+          schema:
+            type: string
+        - name: search_type
+          in: query
+          required: false
+          description: Type of search
+          schema:
+            type: string
+            enum: [full_text, series_id]
+            default: full_text
+        - name: order_by
+          in: query
+          required: false
+          description: Variable to order results by
+          schema:
+            type: string
+            enum:
+              [
+                search_rank,
+                series_id,
+                title,
+                units,
+                frequency,
+                seasonal_adjustment,
+                realtime_start,
+                realtime_end,
+                last_updated,
+                observation_start,
+                observation_end,
+                popularity,
+                group_popularity,
+              ]
+        - name: sort_order
+          in: query
+          required: false
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: filter_variable
+          in: query
+          required: false
+          description: Variable to filter results by
+          schema:
+            type: string
+            enum: [frequency, units, seasonal_adjustment]
+        - name: filter_value
+          in: query
+          required: false
+          description: Value to filter by
+          schema:
+            type: string
+        - name: tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+        - name: exclude_tag_names
+          in: query
+          required: false
+          description: Semicolon-delimited list of tag names to exclude
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/categories:
+    get:
+      summary: Get series categories
+      description: Get the categories for an economic data series
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/release:
+    get:
+      summary: Get series release
+      description: Get the release for an economic data series
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/search/tags:
+    get:
+      summary: Search series tags
+      description: Get the FRED tags for a series search
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_search_text
+          in: query
+          required: true
+          description: Text to search for
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/search/related_tags:
+    get:
+      summary: Search series related tags
+      description: Get the related FRED tags for one or more FRED tags within a series search
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_search_text
+          in: query
+          required: true
+          description: Text to search for
+          schema:
+            type: string
+        - name: tag_names
+          in: query
+          required: true
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/tags:
+    get:
+      summary: Get series tags
+      description: Get the FRED tags for a series
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/updates:
+    get:
+      summary: Get series updates
+      description: Get economic data series sorted by when observations were updated
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/series/vintagedates:
+    get:
+      summary: Get series vintage dates
+      description: Get the dates in history when a series' data values were revised or new data values were released
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/sources:
+    get:
+      summary: Get all sources
+      description: Get all sources of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/source:
+    get:
+      summary: Get a source
+      description: Get a source of economic data
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: source_id
+          in: query
+          required: true
+          description: The ID for a source
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/source/releases:
+    get:
+      summary: Get source releases
+      description: Get the releases for a source
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: source_id
+          in: query
+          required: true
+          description: The ID for a source
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/tags:
+    get:
+      summary: Get FRED tags
+      description: Get FRED tags
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/SortOrder"
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/related_tags:
+    get:
+      summary: Get related tags
+      description: Get related FRED tags for one or more FRED tags
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: tag_names
+          in: query
+          required: true
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /fred/tags/series:
+    get:
+      summary: Get tagged series
+      description: Get the series matching tags
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - $ref: "#/components/parameters/RealtimeStart"
+        - $ref: "#/components/parameters/RealtimeEnd"
+        - name: tag_names
+          in: query
+          required: true
+          description: Semicolon-delimited list of tag names
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /geofred/series/group:
+    get:
+      summary: Get series group info
+      description: Series Group Info - Maps API
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /geofred/series/data:
+    get:
+      summary: Get series data info
+      description: Series Data Info - Maps API
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+        - name: series_id
+          in: query
+          required: true
+          description: The ID for a series
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+
+  /geofred/regional/data:
+    get:
+      summary: Get regional data
+      description: Regional Data - Maps API
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+      responses:
+        "200":
+          description: Successful response
+
+  /geofred/shape/files:
+    get:
+      summary: Get shape files
+      description: Shape Files - Maps API
+      parameters:
+        - $ref: "#/components/parameters/ApiKey"
+        - $ref: "#/components/parameters/FileType"
+      responses:
+        "200":
+          description: Successful response
+

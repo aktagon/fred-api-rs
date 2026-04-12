@@ -1,30 +1,18 @@
-# FRED API Client for Rust
+# fred-api-rs
 
-A Rust client library for the Federal Reserve Economic Data (FRED) API, providing access to economic data from the Federal Reserve Bank of St. Louis.
-
-[![Crates.io](https://img.shields.io/crates/v/fred-api-client.svg)](https://crates.io/crates/fred-api-client)
-[![Documentation](https://docs.rs/fred-api-client/badge.svg)](https://docs.rs/fred-api-client)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Rust client for the [FRED API](https://fred.stlouisfed.org/docs/api/) — economic time series from the Federal Reserve. Async, typed, JSON only.
 
 ## About FRED
 
-The Federal Reserve Economic Data (FRED) is a database of economic data maintained by the Federal Reserve Bank of St. Louis. It contains thousands of economic time series from scores of national, international, public, and private sources.
+FRED is a database of economic time series maintained by the Federal Reserve Bank of St. Louis. Thousands of series from national, international, public, and private sources.
 
-For more information about the FRED API, visit the [official documentation](https://fred.stlouisfed.org/docs/api/).
+[Official API documentation](https://fred.stlouisfed.org/docs/api/)
 
-## Features
+## What it covers
 
-- **Comprehensive API Coverage**: Access to all FRED API endpoints including:
-  - Categories and series data
-  - Economic releases and sources
-  - Tags and search functionality
-  - Geographic data (GeoFRED)
-- **Type-safe**: Fully typed Rust interface with proper error handling
-- **Async Support**: Built on `reqwest` for asynchronous HTTP requests
-- **Flexible Response Formats**: Support for XML and JSON response formats
-- **Easy to Use**: Simple, intuitive API design
+Categories, series, observations, releases, sources, tags, search, and GeoFRED (regional data).
 
-## Installation
+## Install
 
 Add this to your `Cargo.toml`:
 
@@ -41,7 +29,7 @@ cargo add fred-api-client
 
 ## Quick Start
 
-First, you'll need to obtain a FRED API key from the [FRED website](https://fred.stlouisfed.org/docs/api/api_key.html).
+Get a [FRED API key](https://fred.stlouisfed.org/docs/api/api_key.html), then:
 
 ```rust
 use fred_api_client::{apis::default_api, apis::configuration::Configuration};
@@ -68,67 +56,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## API Coverage
+## API coverage
 
-This client provides access to all FRED API endpoints:
-
-### Categories
-
-- Get categories and subcategories
-- Search and filter categories
-- Get series within categories
-
-### Series
-
-- Retrieve economic data series
-- Get observations/data points
-- Search series by text or tags
-- Get series metadata and vintage dates
-
-### Releases
-
-- Access economic data releases
-- Get release dates and sources
-- Browse release-specific series
-
-### Sources
-
-- Get data sources information
-- Browse source-specific releases
-
-### Tags
-
-- Search and filter by tags
-- Get related tags
-- Browse tagged series
-
-### GeoFRED
-
-- Geographic/regional economic data
-- Shape files for mapping
-- Regional data series
-
-## API Key
-
-You need a FRED API key to use this client. Get your free API key at:
-https://fred.stlouisfed.org/docs/api/api_key.html
-
-## Response Formats
-
-NOTE: This library currently only supports the JSON response format.
-
-The FRED API supports multiple response formats:
-
-- `json`
-- `xml` (default)
-
-Specify the format using the `file_type` parameter in API calls.
+| Endpoint   | What you get                                                |
+| ---------- | ----------------------------------------------------------- |
+| Categories | Browse and search category trees, list series in a category |
+| Series     | Observations, metadata, vintage dates, text/tag search      |
+| Releases   | Release schedules, sources, related series                  |
+| Sources    | Data source metadata and their releases                     |
+| Tags       | Filter and browse by tag, find related tags                 |
+| GeoFRED    | Regional economic data and shape files                      |
 
 ## Documentation
 
-- [API Reference](docs/API.md) - Complete API endpoint documentation
-- [FRED API Documentation](https://fred.stlouisfed.org/docs/api/) - Official FRED API docs
-- Run `cargo doc --open` for local documentation
+- [API Reference](docs/API.md)
+- [FRED API docs](https://fred.stlouisfed.org/docs/api/)
+- `cargo doc --open`
 
 ## Examples
 
@@ -140,19 +83,11 @@ cargo run --example series_observations
 cargo run --example category_search
 ```
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## Support
 
-- Commercial support available: christian@aktagon.com
-- Issues and questions: [GitHub Issues](https://github.com/aktagon/edgar-rs/issues)
+- Commercial support: christian@aktagon.com
+- Issues: [GitHub Issues](https://github.com/aktagon/fred-api-rs/issues)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**Note**: This is an unofficial client library. FRED® is a registered trademark of the Federal Reserve Bank of St. Louis.
+MIT. This is an unofficial client. FRED is a registered trademark of the Federal Reserve Bank of St. Louis.
